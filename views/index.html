@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <form id="profile_form">
+        <input type="file" name="input_profile" id="input_profile" multiple>
+        <button type="submit">제출</button>
+    </form>
+
+    <h3>저장목록</h3>
+    <table id="profile_list" border="1">
+        <tbody>
+            {% for table in tableList %}
+                <tr>
+                    <td>{{table}}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div id="core"></div>
+    <div id="tesk"></div>
+    
+    <h3 id="state"></h3>
+    
+    <div id="data"></div>
+
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="/sequelize.js"></script>
+</body>
+</html>
