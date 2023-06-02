@@ -7,7 +7,7 @@ class Profile extends Sequelize.Model{
                 type: Sequelize.STRING(20),
                 allowNull : false,
             },
-            tesk : {
+            task : {
                 type: Sequelize.STRING(20),
                 allowNull : false,
             },

@@ -1,10 +1,13 @@
+let fileName;
+let select;
+
 document.querySelectorAll('#profile_list tr').forEach((el) => {
     el.addEventListener('click', function () {
-        const profile = el.querySelector('td').textContent;
-        getdata(profile);
+        fileName = el.querySelector('td').textContent;
+        select = undefined;
+        getdata();
     });
 });
-
 
 document.getElementById('profile_form').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -63,7 +66,7 @@ async function getList(){
     profiles.map(function(profile){
         const row = document.createElement('tr');
         row.addEventListener('click',() =>{
-            getdata(profile);
+            getdata();
         });
         let td = document.createElement('td');
         td.textContent = profile;
@@ -73,7 +76,7 @@ async function getList(){
     });
 }
 
-async function getdata(fileName){
+async function getdata(){
     console.log(fileName,"선택됨");
     const state = document.querySelector('#state');
     state.innerHTML='';
@@ -82,67 +85,24 @@ async function getdata(fileName){
     const res = await axios.get(`profiles/data/${fileName}`);
     const datas = res.data.datas;
     const cores = res.data.cores;
-    const tesks = res.data.tesks;
+    const tasks = res.data.tasks;
 
-    const tesk_div = document.querySelector('#core');
-    tesk_div.innerHTML = '';
-    tesks.map(function(tesk){
+    const task_div = document.querySelector('#core');
+    task_div.innerHTML = '';
+    tasks.map(function(task){
         let button = document.createElement('button');
 
-        button.textContent = tesk.core;
-        button.addEventListener('click', async function(){
-            const res = await axios.get(`profiles/coredata/${fileName}/${tesk.core}`);
-            const datas = res.data;
-
-            const div = document.querySelector('#data');
-            div.innerHTML = '';
-        
-            datas.map(function(data){
-                let row = document.createElement('span');
-                row.textContent = data.tesk+"\t";
-                div.appendChild(row);
-                row = document.createElement('span');
-                row.textContent = data.usaged+"\t";
-                div.appendChild(row);
-                row = document.createElement('br');
-                div.appendChild(row);
-            });
-
-            const state = document.querySelector('#state');
-            state.innerHTML='';
-            state.append(`${fileName}의 ${tesk.core} 정보`);
-        });
-        tesk_div.appendChild(button);
+        button.textContent = task.core;
+        button.addEventListener('click', ()=>{updateChart('task', task.core)});
+        task_div.appendChild(button);
     });
 
-    const core_div = document.querySelector('#tesk');
+    const core_div = document.querySelector('#task');
     core_div.innerHTML = '';
     cores.map(function(core){
         let button = document.createElement('button');
-        button.textContent = core.tesk;
-        button.addEventListener('click', async function(){
-            const res = await axios.get(`profiles/teskdata/${fileName}/${core.tesk}`);
-            const datas = res.data;
-
-            const div = document.querySelector('#data');
-            div.innerHTML = '';
-
-            datas.map(function(data){
-                let row = document.createElement('span');
-                row.textContent = data.core+"\t";
-                div.appendChild(row);
-                row = document.createElement('span');
-                row.textContent = data.usaged+"\t";
-                div.appendChild(row);
-                row = document.createElement('br');
-                div.appendChild(row);
-            });
-
-            const state = document.querySelector('#state');
-            state.innerHTML='';
-            state.append(`${fileName}의 ${core.tesk} 정보`);
-
-        });
+        button.textContent = core.task;
+        button.addEventListener('click', ()=>{updateChart('core', core.task)});
         core_div.appendChild(button);
     });
 
@@ -155,7 +115,7 @@ async function getdata(fileName){
         row.textContent = data.core+"\t";
         div.appendChild(row);
         row = document.createElement('span');
-        row.textContent = data.tesk+"\t";
+        row.textContent = data.task+"\t";
         div.appendChild(row);
         row = document.createElement('span');
         row.textContent = data.usaged+"\t";
@@ -165,15 +125,6 @@ async function getdata(fileName){
     });
     
 }
-
-async function get_coredata(fileName, cores){
-    
-}
-
-async function get_teskdata(fileName, tesks){
-
-}
-
 
 function readTextFile(file, save) {
     const reader = new FileReader();
@@ -195,3 +146,110 @@ function readTextFile(file, save) {
     reader.readAsText(file, 'UTF-8');
 
 }
+
+let chart;
+let chart_type = 'line';
+let labels = [];
+let minData = [];
+let maxData = [];
+let avgData = [];
+
+document.getElementById('line').addEventListener('click', function () { chart_type = 'line'; updateChart(null,null);});
+document.getElementById('bar').addEventListener('click', function () { chart_type = 'bar'; updateChart(null,null);});
+document.getElementById('polarArea').addEventListener('click', function () { chart_type = 'polarArea'; updateChart(null,null);});
+
+async function updateChart(type, choose_name){
+    console.log(fileName,select);
+
+    const profiler = document.getElementById('profiler').getContext('2d');
+    if (chart) {
+        chart.destroy();
+    }
+
+    if(type == 'core'){
+        select = choose_name;
+        const res = await axios.get(`profiles/taskdata/${fileName}/${select}`);
+        const datas = res.data;
+
+
+        labels = [];
+        minData = [];
+        maxData = [];
+        avgData = [];
+        datas.forEach((data) => {
+            labels.push(data.core);
+            minData.push(data.min_usaged);
+            maxData.push(data.max_usaged);
+            avgData.push(data.avg_usaged);
+        });
+        console.log(datas);
+
+        const state = document.querySelector('#state');
+        state.innerHTML='';
+        state.append(`${fileName}의 ${select} 정보`);
+
+    }else if(type == 'task'){
+        select = choose_name;
+        const res = await axios.get(`profiles/coredata/${fileName}/${select}`);
+        const datas = res.data;
+
+        labels = [];
+        minData = [];
+        maxData = [];
+        avgData = [];
+        datas.forEach((data) => {
+            labels.push(data.task);
+            minData.push(data.min_usaged);
+            maxData.push(data.max_usaged);
+            avgData.push(data.avg_usaged);
+        });
+
+        const state = document.querySelector('#state');
+        state.innerHTML='';
+        state.append(`${fileName}의 ${select} 정보`);
+
+    }
+    if(fileName==undefined || select==undefined) return;
+
+    chart = new Chart(profiler, {
+        type: `${chart_type}`,
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Min',
+            data: minData,
+            borderColor: 'rgba(0, 0, 255, 0.5)',
+            backgroundColor: 'rgba(0, 0, 255, 0.5)',
+          }, {
+            label: 'Max',
+            data: maxData,
+            borderColor: 'rgba(255, 0, 0, 1)',
+            backgroundColor: 'rgba(255, 0, 0, 0.5)',
+          }, {
+            label: 'Avg',
+            data: avgData,
+            borderColor: 'rgba(100, 255, 30, 1)',
+            backgroundColor: 'rgba(100, 255, 30, 0.5)',
+          }]
+        },
+        options: {
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          },
+          plugins: {
+            title: {
+              display: true,
+              text: `${fileName}의 ${select} 정보`,
+              font: {
+                size: 30
+              }
+            }
+          }
+        },
+    });
+    
+}
+

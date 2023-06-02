@@ -55,17 +55,17 @@ router.get('/data/:tableName', async (req,res)=>{
 
         const datas = await profile_model.findAll();
         
-        const tesks = await profile_model.findAll({
+        const tasks = await profile_model.findAll({
             attributes: [sequelize.fn('DISTINCT', sequelize.col('core')), 'core'],
         });
         //console.log(core);
 
         const cores = await profile_model.findAll({
-            attributes: [sequelize.fn('DISTINCT', sequelize.col('tesk')), 'tesk'],
+            attributes: [sequelize.fn('DISTINCT', sequelize.col('task')), 'task'],
         });
-        //console.log(tesk);
+        //console.log(task);
 
-        res.json({datas: datas, cores : cores, tesks : tesks});
+        res.json({datas: datas, cores : cores, tasks : tasks});
     }catch(error){
         console.error('데이터 조회 오류', error);
     }
@@ -74,31 +74,44 @@ router.get('/data/:tableName', async (req,res)=>{
 router.get('/coredata/:tableName/:core', async(req,res)=>{
 
     const { tableName, core } = req.params;
-    console.log('core.');
 
     profile_model.initiate(sequelize, tableName);
 
     const data = await profile_model.findAll({
-        attributes: ['tesk', 'usaged'],
+        attributes: [
+          'task',
+          [sequelize.fn('max', sequelize.col('usaged')), 'max_usaged'],
+          [sequelize.fn('min', sequelize.col('usaged')), 'min_usaged'],
+          [sequelize.fn('avg', sequelize.col('usaged')), 'avg_usaged']
+        ],
         where: {
-            core: core,
-        }
-    });
+          core: core
+        },
+        group: ['task']
+      });
+
     res.json(data);
 });
 
-router.get('/teskdata/:tableName/:tesk', async(req,res)=>{
-    const { tableName, tesk } = req.params;
-    console.log('tesk.');
+router.get('/taskdata/:tableName/:task', async(req,res)=>{
+    const { tableName, task } = req.params;
 
     profile_model.initiate(sequelize, tableName);
 
+
     const data = await profile_model.findAll({
-        attributes: ['core', 'usaged'],
+        attributes: [
+          'core',
+          [sequelize.fn('max', sequelize.col('usaged')), 'max_usaged'],
+          [sequelize.fn('min', sequelize.col('usaged')), 'min_usaged'],
+          [sequelize.fn('avg', sequelize.col('usaged')), 'avg_usaged']
+        ],
         where: {
-            tesk: tesk,
-        }
-    });
+          task: task,
+        },
+        group: ['core']
+      });
+
     res.json(data);
 });
 

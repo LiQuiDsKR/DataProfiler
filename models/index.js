@@ -15,7 +15,7 @@ async function createTable(tableName){
                 type: Sequelize.STRING(20),
                 allowNull : false,
             },
-            tesk : {
+            task : {
                 type: Sequelize.STRING(20),
                 allowNull : false,
             },
@@ -58,7 +58,7 @@ async function createDynamicTable(profile){
         }
         for(let column = 1; column < profile[row].length; column++){
             await DynamicModel.create({
-                tesk: profile[core_row][column-1],
+                task: profile[core_row][column-1],
                 core : profile[row][0],
                 usaged : profile[row][column],
             });
