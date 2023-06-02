@@ -88,21 +88,48 @@ async function getdata(){
     const tasks = res.data.tasks;
 
     const task_div = document.querySelector('#core');
-    task_div.innerHTML = '';
+    task_div.innerHTML = 'select core : ';
     tasks.map(function(task){
         let button = document.createElement('button');
-
+        button.className = 'btn btn-info me-2';
         button.textContent = task.core;
-        button.addEventListener('click', ()=>{updateChart('task', task.core)});
+        button.addEventListener('click', function(){
+            updateChart('task', task.core);
+            const coreDiv = document.getElementById('core');
+            const coreBtns = coreDiv.getElementsByClassName('btn');
+            for (let i = 0; i < coreBtns.length; i++) {
+                coreBtns[i].className = "btn btn-info me-2";
+            }
+            const taskDiv = document.getElementById('task');
+            const taskBtns = taskDiv.getElementsByClassName('btn');
+            for (let i = 0; i < taskBtns.length; i++) {
+                taskBtns[i].className = "btn btn-success me-2";
+            }
+            this.className = "btn btn-secondary me-2";
+        });
         task_div.appendChild(button);
     });
 
     const core_div = document.querySelector('#task');
-    core_div.innerHTML = '';
+    core_div.innerHTML = 'select task : ';
     cores.map(function(core){
         let button = document.createElement('button');
+        button.className = 'btn btn-success me-2';
         button.textContent = core.task;
-        button.addEventListener('click', ()=>{updateChart('core', core.task)});
+        button.addEventListener('click', function(){
+            updateChart('core', core.task);
+            const coreDiv = document.getElementById('core');
+            const coreBtns = coreDiv.getElementsByClassName('btn');
+            for (let i = 0; i < coreBtns.length; i++) {
+                coreBtns[i].className = "btn btn-info me-2";
+            }
+            const taskDiv = document.getElementById('task');
+            const taskBtns = taskDiv.getElementsByClassName('btn');
+            for (let i = 0; i < taskBtns.length; i++) {
+                taskBtns[i].className = "btn btn-success me-2";
+            }
+            this.className = "btn btn-secondary me-2";
+        });
         core_div.appendChild(button);
     });
 
@@ -154,12 +181,24 @@ let minData = [];
 let maxData = [];
 let avgData = [];
 
-document.getElementById('line').addEventListener('click', function () { chart_type = 'line'; updateChart(null,null);});
-document.getElementById('bar').addEventListener('click', function () { chart_type = 'bar'; updateChart(null,null);});
-document.getElementById('polarArea').addEventListener('click', function () { chart_type = 'polarArea'; updateChart(null,null);});
+const btnline = document.getElementById('line');
+const btnbar = document.getElementById('bar');
+const btnpolarArea = document.getElementById('polarArea');
+
+btnline.addEventListener('click', function () { 
+    chart_type = 'line'; updateChart(null,null);
+    btnline.className="btn btn-secondary"; btnbar.className="btn btn-primary"; btnpolarArea.className="btn btn-primary";
+})
+btnbar.addEventListener('click', function () {
+    chart_type = 'bar'; updateChart(null,null);
+    btnline.className="btn btn-primary"; btnbar.className="btn btn-secondary"; btnpolarArea.className="btn btn-primary";
+});
+btnpolarArea.addEventListener('click', function () {
+    chart_type = 'polarArea'; updateChart(null,null);
+    btnline.className="btn btn-primary"; btnbar.className="btn btn-primary"; btnpolarArea.className="btn btn-secondary";
+ });
 
 async function updateChart(type, choose_name){
-    console.log(fileName,select);
 
     const profiler = document.getElementById('profiler').getContext('2d');
     if (chart) {
@@ -170,7 +209,6 @@ async function updateChart(type, choose_name){
         select = choose_name;
         const res = await axios.get(`profiles/taskdata/${fileName}/${select}`);
         const datas = res.data;
-
 
         labels = [];
         minData = [];
