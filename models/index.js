@@ -41,8 +41,19 @@ async function createTable(tableName){
     return Model;
 }
 
+async function dropTable(tableName) {
+    try {
+        await sequelize.query(`DROP TABLE IF EXISTS \`${tableName}\``);
+        console.log(`테이블 '${tableName}'이(가) 삭제되었습니다.`);
+    } catch (error) {
+      console.error(`테이블 삭제 중 오류가 발생했습니다: ${error}`);
+    }
+}
+  
+
+
 async function createDynamicTable(profile){
-    
+    console.log(profile);
     const tableName = profile[0][0];
     const DynamicModel = await createTable(tableName);
 
@@ -82,5 +93,5 @@ async function getTableList() {
 db.sequelize = sequelize;
 
 
-module.exports = {db, createDynamicTable, sequelize, getTableList};
+module.exports = {db, createDynamicTable, sequelize, getTableList, dropTable};
 

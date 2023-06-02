@@ -1,10 +1,18 @@
 let fileName;
 let select;
 
-document.querySelectorAll('#profile_list tr').forEach((el) => {
+const profileList = document.querySelectorAll('#profile_list tr td:first-child');
+profileList.forEach((el) => {
     el.addEventListener('click', function () {
-        fileName = el.querySelector('td').textContent;
+        fileName = el.textContent;
+        profileList.forEach((otherEl) => {
+            otherEl.style.setProperty("background-color", "white");
+        });
+        this.style.setProperty("background-color", "#888888");
         select = undefined;
+        if (chart) {
+            chart.destroy();
+        }
         getdata();
     });
 });
@@ -34,8 +42,6 @@ document.getElementById('profile_form').addEventListener('submit', async (e) => 
 
     await Promise.all(filePromises);
 
-    console.log(profiles);
-
     if(!is_error){
         const response = await fetch('/profiles',{
             method: 'POST',
@@ -59,31 +65,46 @@ document.getElementById('profile_form').addEventListener('submit', async (e) => 
 async function getList(){
     const res = await axios.get('profiles');
     const profiles = res.data;
-
+    console.log("제발좀떠줘");
+    
     const tbody = document.querySelector('#profile_list tbody');
     tbody.innerHTML = '';
-
     profiles.map(function(profile){
         const row = document.createElement('tr');
-        row.addEventListener('click',() =>{
+        const td = document.createElement('td');
+        td.textContent = profile;
+        td.addEventListener('click',function(){
+            fileName = profile;
+            const profileList = document.querySelectorAll('#profile_list tr td:first-child');
+            profileList.forEach((otherEl) => {
+                otherEl.style.setProperty("background-color", "white");
+            });
+            this.style.setProperty("background-color", "#888888");
+            if (chart) {
+                chart.destroy();
+            }
             getdata();
         });
-        let td = document.createElement('td');
-        td.textContent = profile;
         row.appendChild(td);
+        const td2 = document.createElement('td');
+        const btndrop = document.createElement('button');
+        btndrop.textContent="삭제";
+        btndrop.addEventListener('click',function(){ deleteTable(`${profile}`); });
+        td2.appendChild(btndrop);
+        row.appendChild(td2);
         
         tbody.appendChild(row);
     });
 }
 
+async function deleteTable(name){
+    await axios.delete(`profiles/drop/${name}`);
+    setTimeout(getList,50);
+}
+
 async function getdata(){
-    console.log(fileName,"선택됨");
-    const state = document.querySelector('#state');
-    state.innerHTML='';
-    state.append(`${fileName}의 전체정보`);
 
     const res = await axios.get(`profiles/data/${fileName}`);
-    const datas = res.data.datas;
     const cores = res.data.cores;
     const tasks = res.data.tasks;
 
@@ -131,24 +152,6 @@ async function getdata(){
             this.className = "btn btn-secondary me-2";
         });
         core_div.appendChild(button);
-    });
-
-
-    const div = document.querySelector('#data');
-    div.innerHTML = '';
-
-    datas.map(function(data){
-        let row = document.createElement('span');
-        row.textContent = data.core+"\t";
-        div.appendChild(row);
-        row = document.createElement('span');
-        row.textContent = data.task+"\t";
-        div.appendChild(row);
-        row = document.createElement('span');
-        row.textContent = data.usaged+"\t";
-        div.appendChild(row);
-        row = document.createElement('br');
-        div.appendChild(row);
     });
     
 }
@@ -220,11 +223,6 @@ async function updateChart(type, choose_name){
             maxData.push(data.max_usaged);
             avgData.push(data.avg_usaged);
         });
-        console.log(datas);
-
-        const state = document.querySelector('#state');
-        state.innerHTML='';
-        state.append(`${fileName}의 ${select} 정보`);
 
     }else if(type == 'task'){
         select = choose_name;
@@ -241,10 +239,6 @@ async function updateChart(type, choose_name){
             maxData.push(data.max_usaged);
             avgData.push(data.avg_usaged);
         });
-
-        const state = document.querySelector('#state');
-        state.innerHTML='';
-        state.append(`${fileName}의 ${select} 정보`);
 
     }
     if(fileName==undefined || select==undefined) return;

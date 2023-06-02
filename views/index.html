@@ -24,6 +24,7 @@
             {% for table in tableList %}
                 <tr>
                     <td>{{table}}</td>
+                    <td><button onclick="deleteTable('{{table}}'); getList();">삭제</button></td>
                 </tr>
             {% endfor %}
         </tbody>
@@ -45,10 +46,6 @@
         </div>
 
     </div>
-
-    <h3 id="state"></h3>
-
-    <div id="data"></div>
     
 
 

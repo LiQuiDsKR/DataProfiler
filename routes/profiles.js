@@ -1,7 +1,7 @@
 const express = require('express');
 
 const router = express.Router();
-const { createDynamicTable, getTableList, sequelize } = require('../models/index');
+const { createDynamicTable, getTableList, sequelize, dropTable } = require('../models/index');
 const profile_model = require('../models/profile');
 
 router.post('/', async (req, res) => {
@@ -12,9 +12,9 @@ router.post('/', async (req, res) => {
         const tableList = await getTableList();
   
     for (let file_num = 0; file_num < profiles.length; file_num++) {
-        const tableName = profiles[file_num][0][0].toLowerCase();
+        profiles[file_num][0][0] = profiles[file_num][0][0].toLowerCase().slice(0,-4);
   
-        if (tableList.includes(tableName)) {
+        if (tableList.includes(profiles[file_num][0][0])) {
           console.log("이미 존재하는 파일입니다");
           continue;
         }
@@ -58,16 +58,24 @@ router.get('/data/:tableName', async (req,res)=>{
         const tasks = await profile_model.findAll({
             attributes: [sequelize.fn('DISTINCT', sequelize.col('core')), 'core'],
         });
-        //console.log(core);
 
         const cores = await profile_model.findAll({
             attributes: [sequelize.fn('DISTINCT', sequelize.col('task')), 'task'],
         });
-        //console.log(task);
-
+        
         res.json({datas: datas, cores : cores, tasks : tasks});
     }catch(error){
         console.error('데이터 조회 오류', error);
+    }
+});
+
+router.delete('/drop/:tableName', async(req,res)=>{
+    try{
+        const {tableName} = req.params;
+        dropTable(tableName);
+        res.json({state:'success'});
+    }catch(error){
+        res.json({state:'error'});
     }
 });
 
