@@ -43,5 +43,5 @@ app.use((err,req,res,next)=>{
 });
 
 app.listen(app.get('port'), () =>{
-    console.log(app.get('port'),'번 포트 대기');
+    console.log("http://localhost:"+app.get('port')+" server open");
 });

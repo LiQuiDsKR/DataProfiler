@@ -1,5 +1,5 @@
-let fileName;
-let select;
+let fileName="";
+let selete="";
 
 const profileList = document.querySelectorAll('#profile_list tr td:first-child');
 profileList.forEach((el) => {
@@ -65,7 +65,6 @@ document.getElementById('profile_form').addEventListener('submit', async (e) => 
 async function getList(){
     const res = await axios.get('profiles');
     const profiles = res.data;
-    console.log("제발좀떠줘");
     
     const tbody = document.querySelector('#profile_list tbody');
     tbody.innerHTML = '';
@@ -85,6 +84,7 @@ async function getList(){
             }
             getdata();
         });
+        if(profile==fileName) td.style.setProperty("background-color", "#888888");
         row.appendChild(td);
         const td2 = document.createElement('td');
         const btndrop = document.createElement('button');
@@ -99,6 +99,14 @@ async function getList(){
 
 async function deleteTable(name){
     await axios.delete(`profiles/drop/${name}`);
+    if(fileName==name && chart) {
+        chart.destroy();
+        const task_div = document.querySelector('#core');
+        task_div.innerHTML="";
+        const core_div = document.querySelector('#task');
+        core_div.innerHTML = '';
+        fileName = "";
+    };
     setTimeout(getList,50);
 }
 
@@ -189,16 +197,19 @@ const btnbar = document.getElementById('bar');
 const btnpolarArea = document.getElementById('polarArea');
 
 btnline.addEventListener('click', function () { 
-    chart_type = 'line'; updateChart(null,null);
+    chart_type = 'line';
     btnline.className="btn btn-secondary"; btnbar.className="btn btn-primary"; btnpolarArea.className="btn btn-primary";
+    if(fileName.length()!=0) updateChart(null,null);
 })
 btnbar.addEventListener('click', function () {
-    chart_type = 'bar'; updateChart(null,null);
+    chart_type = 'bar';
     btnline.className="btn btn-primary"; btnbar.className="btn btn-secondary"; btnpolarArea.className="btn btn-primary";
+    if(fileName.length()!=0) updateChart(null,null);
 });
 btnpolarArea.addEventListener('click', function () {
-    chart_type = 'polarArea'; updateChart(null,null);
+    chart_type = 'polarArea';
     btnline.className="btn btn-primary"; btnbar.className="btn btn-primary"; btnpolarArea.className="btn btn-secondary";
+    if(fileName.length()!=0) updateChart(null,null);
  });
 
 async function updateChart(type, choose_name){
