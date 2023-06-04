@@ -199,17 +199,17 @@ const btnpolarArea = document.getElementById('polarArea');
 btnline.addEventListener('click', function () { 
     chart_type = 'line';
     btnline.className="btn btn-secondary"; btnbar.className="btn btn-primary"; btnpolarArea.className="btn btn-primary";
-    if(fileName.length()!=0) updateChart(null,null);
+    if(fileName.length!=0) updateChart(null,null);
 })
 btnbar.addEventListener('click', function () {
     chart_type = 'bar';
     btnline.className="btn btn-primary"; btnbar.className="btn btn-secondary"; btnpolarArea.className="btn btn-primary";
-    if(fileName.length()!=0) updateChart(null,null);
+    if(fileName.length!=0) updateChart(null,null);
 });
 btnpolarArea.addEventListener('click', function () {
     chart_type = 'polarArea';
     btnline.className="btn btn-primary"; btnbar.className="btn btn-primary"; btnpolarArea.className="btn btn-secondary";
-    if(fileName.length()!=0) updateChart(null,null);
+    if(fileName.length!=0) updateChart(null,null);
  });
 
 async function updateChart(type, choose_name){
