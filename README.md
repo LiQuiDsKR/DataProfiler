@@ -3,7 +3,7 @@
 ### 0. Mysql should be installed on your environment.
 ### &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1. Modify password in javaweb/config/config.json accordingly(with your own mysql password)
 ### &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2. $ mysql -u root -p
-### &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3. mysql> enter your password
+### &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3. Enter password:
 ### &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4. mysql> use javaweb;
 ### &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;5. mysql> exit<br>
 ### 1. $ npm install
