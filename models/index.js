@@ -69,6 +69,7 @@ async function createDynamicTable(profile){
         }
         for(let column = 1; column < profile[row].length; column++){
             try{
+            
             await DynamicModel.create({
                 task: profile[core_row][column-1],
                 core : profile[row][0],
