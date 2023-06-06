@@ -6,7 +6,7 @@ const { getTableList } = require('../models/index');
 router.get('/', async (req,res)=>{
     getTableList()
         .then((tableList) => {
-            console.log('테이블 리스트:', tableList);
+            //console.log('테이블 리스트:', tableList);
             res.render('index', {tableList});
         })
         .catch((error) => {

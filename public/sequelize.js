@@ -72,6 +72,7 @@ async function getList(){
         const row = document.createElement('tr');
         const td = document.createElement('td');
         td.textContent = profile;
+        td.className= 'text-center fw-semibold';
         td.addEventListener('click',function(){
             fileName = profile;
             const profileList = document.querySelectorAll('#profile_list tr td:first-child');
@@ -89,6 +90,7 @@ async function getList(){
         const td2 = document.createElement('td');
         const btndrop = document.createElement('button');
         btndrop.textContent="삭제";
+        btndrop.className="btn btn-danger";
         btndrop.addEventListener('click',function(){ deleteTable(`${profile}`); });
         td2.appendChild(btndrop);
         row.appendChild(td2);

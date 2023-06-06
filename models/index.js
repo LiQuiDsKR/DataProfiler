@@ -53,7 +53,7 @@ async function dropTable(tableName) {
 
 
 async function createDynamicTable(profile){
-    console.log(profile);
+    // console.log(profile);
     const tableName = profile[0][0];
     const DynamicModel = await createTable(tableName);
 
@@ -68,11 +68,15 @@ async function createDynamicTable(profile){
             continue;
         }
         for(let column = 1; column < profile[row].length; column++){
+            try{
             await DynamicModel.create({
                 task: profile[core_row][column-1],
                 core : profile[row][0],
                 usaged : profile[row][column],
             });
+            }catch(e){
+                console.log("데이터 오류 발생");
+            }
         }
     }
 }
