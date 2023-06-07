@@ -7,7 +7,7 @@ const profile_model = require('../models/profile');//?
 router.post('/', async (req, res) => {
     const profiles = req.body;    //클라이언트요청문으로 보내는 body정보 가져옴(input 파일 내용 가져오는거, 어느정도 정제된 input 파일, 3차원 배열 형태임)
     let count = 0;
-    console.log(profiles, '프로파일 입니다~~~~~~~~~~');
+    //console.log(profiles, '프로파일 입니다~~~~~~~~~~');
     try {
         const tableList = await getTableList();    //DB 테이블 불러오기 기능
     
