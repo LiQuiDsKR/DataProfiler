@@ -76,7 +76,7 @@ async function createDynamicTable(profile){
                 usaged : profile[row][column],
             });
             }catch(e){
-                console.log("데이터 오류 발생");
+                console.log(`Error: ${tableName} 파일 데이터 오류 발생`);
             }
         }
     }
