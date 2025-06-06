@@ -1,5 +1,5 @@
 let fileName="";
-let selete="";
+let select="";
 
 const profileList = document.querySelectorAll('#profile_list tr td:first-child');
 profileList.forEach((el) => {
@@ -197,6 +197,7 @@ let avgData = [];
 const btnline = document.getElementById('line');
 const btnbar = document.getElementById('bar');
 const btnpolarArea = document.getElementById('polarArea');
+const btn3d = document.getElementById('threeD');
 
 btnline.addEventListener('click', function () { 
     chart_type = 'line';
@@ -213,10 +214,24 @@ btnpolarArea.addEventListener('click', function () {
     btnline.className="btn btn-primary"; btnbar.className="btn btn-primary"; btnpolarArea.className="btn btn-secondary";
     if(fileName.length!=0) updateChart(null,null);
  });
+btn3d.addEventListener('click', function () {
+    chart_type = '3d';
+    btnline.className="btn btn-primary";
+    btnbar.className="btn btn-primary";
+    btnpolarArea.className="btn btn-primary";
+    btn3d.className="btn btn-secondary";
+    if(fileName.length != 0) draw3DPlot();
+});
 
 async function updateChart(type, choose_name){
+    document.getElementById("profilerChart").style.display = "block";
+    document.getElementById("profilerPlot").style.display = "none";
 
-    const profiler = document.getElementById('profiler').getContext('2d');
+    document.getElementById("core").style.display = "block";
+    document.getElementById("task").style.display = "block";
+
+
+    const profiler = document.getElementById('profilerChart').getContext('2d');
     if (chart) {
         chart.destroy();
     }
@@ -298,3 +313,55 @@ async function updateChart(type, choose_name){
     
 }
 
+async function draw3DPlot() {
+    if (!fileName) return;
+
+    document.getElementById("profilerChart").style.display = "none";
+    document.getElementById("profilerPlot").style.display = "block";
+
+    document.getElementById("core").style.display = "none";
+    document.getElementById("task").style.display = "none";
+
+
+    const res = await axios.get(`profiles/data/${fileName}`);
+    const datas = res.data.datas;
+
+    if (!datas || datas.length === 0) {
+        alert("해당 테이블에 데이터가 없습니다.");
+        return;
+    }
+
+    const plotDiv = document.getElementById('profilerChart');
+    plotDiv.innerHTML = '';
+
+    const x = [], y = [], z = [];
+
+    datas.forEach(row => {
+        x.push(row.core);
+        y.push(row.task);
+        z.push(row.usaged);
+    });
+
+    const trace = {
+        x, y, z,
+        mode: 'markers',
+        type: 'scatter3d',
+        marker: {
+            size: 5,
+            color: z,
+            colorscale: 'Viridis'
+        }
+    };
+
+    const layout = {
+        margin: { l: 0, r: 0, b: 0, t: 40 },
+        title: `${fileName}의 3D 차트`,
+        scene: {
+            xaxis: { title: 'Core' },
+            yaxis: { title: 'Task' },
+            zaxis: { title: 'Usage' }
+        }
+    };
+
+    Plotly.newPlot('profilerPlot', [trace], layout);
+}
