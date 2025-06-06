@@ -139,5 +139,38 @@ router.get('/taskdata/:tableName/:task', async(req,res)=>{
     res.json(data);
 });
 
+// CORE 기준으로 표준편차를 구하여 전달함
+router.get('/deviation/core/:tableName', async (req, res) => {
+  const { tableName } = req.params;
+  profile_model.initiate(sequelize, tableName);
+
+  const data = await profile_model.findAll({
+    attributes: [
+      'core',
+      [sequelize.fn('stddev_pop', sequelize.col('usaged')), 'stddev_usaged']
+    ],
+    group: ['core']
+  });
+
+  res.json(data);
+});
+
+// TASK 기준으로 표준편차를 구하여 전달함
+router.get('/deviation/task/:tableName', async (req, res) => {
+  const { tableName } = req.params;
+  profile_model.initiate(sequelize, tableName);
+
+  const data = await profile_model.findAll({
+    attributes: [
+      'task',
+      [sequelize.fn('stddev_pop', sequelize.col('usaged')), 'stddev_usaged']
+    ],
+    group: ['task']
+  });
+
+  res.json(data);
+});
+
+
 
 module.exports = router;    //이벤트 핸들링 처리지침이 담겨있는 router를 배포함

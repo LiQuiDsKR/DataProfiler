@@ -199,19 +199,40 @@ const btnbar = document.getElementById('bar');
 const btnpolarArea = document.getElementById('polarArea');
 const btn3d = document.getElementById('threeD');
 
+const btnCoreDeviation = document.getElementById('coreDeviation');
+const btnTaskDeviation = document.getElementById('taskDeviation');
+
 btnline.addEventListener('click', function () { 
     chart_type = 'line';
-    btnline.className="btn btn-secondary"; btnbar.className="btn btn-primary"; btnpolarArea.className="btn btn-primary";
+    btnline.className="btn btn-secondary";
+    btnbar.className="btn btn-primary";
+    btnpolarArea.className="btn btn-primary";
+    btn3d.className="btn btn-primary";
+    btnCoreDeviation.className = "btn btn-primary";
+    btnTaskDeviation.className = "btn btn-primary";
+
     if(fileName.length!=0) updateChart(null,null);
 })
 btnbar.addEventListener('click', function () {
     chart_type = 'bar';
-    btnline.className="btn btn-primary"; btnbar.className="btn btn-secondary"; btnpolarArea.className="btn btn-primary";
+    btnline.className="btn btn-primary";
+    btnbar.className="btn btn-secondary";
+    btnpolarArea.className="btn btn-primary";
+    btn3d.className="btn btn-primary";
+    btnCoreDeviation.className = "btn btn-primary";
+    btnTaskDeviation.className = "btn btn-primary";
+
     if(fileName.length!=0) updateChart(null,null);
 });
 btnpolarArea.addEventListener('click', function () {
     chart_type = 'polarArea';
-    btnline.className="btn btn-primary"; btnbar.className="btn btn-primary"; btnpolarArea.className="btn btn-secondary";
+    btnline.className="btn btn-primary";
+    btnbar.className="btn btn-primary";
+    btnpolarArea.className="btn btn-secondary";
+    btn3d.className="btn btn-primary";
+    btnCoreDeviation.className = "btn btn-primary";
+    btnTaskDeviation.className = "btn btn-primary";
+
     if(fileName.length!=0) updateChart(null,null);
  });
 btn3d.addEventListener('click', function () {
@@ -220,7 +241,33 @@ btn3d.addEventListener('click', function () {
     btnbar.className="btn btn-primary";
     btnpolarArea.className="btn btn-primary";
     btn3d.className="btn btn-secondary";
+    btnCoreDeviation.className = "btn btn-primary";
+    btnTaskDeviation.className = "btn btn-primary";
+
     if(fileName.length != 0) draw3DPlot();
+});
+btnCoreDeviation.addEventListener('click', function () {
+    chart_type = 'coreDeviation';
+    btnline.className = "btn btn-primary";
+    btnbar.className = "btn btn-primary";
+    btnpolarArea.className = "btn btn-primary";
+    btn3d.className = "btn btn-primary";
+    btnCoreDeviation.className = "btn btn-secondary";
+    btnTaskDeviation.className = "btn btn-primary";
+    
+    if (fileName.length !== 0) drawCoreDeviationChart();
+});
+btnTaskDeviation.addEventListener('click', function () {
+    chart_type = 'taskDeviation';
+
+    btnline.className = "btn btn-primary";
+    btnbar.className = "btn btn-primary";
+    btnpolarArea.className = "btn btn-primary";
+    btn3d.className = "btn btn-primary";
+    btnCoreDeviation.className = "btn btn-primary";
+    btnTaskDeviation.className = "btn btn-secondary";
+
+    if (fileName.length !== 0) drawTaskDeviationChart();
 });
 
 async function updateChart(type, choose_name){
@@ -364,4 +411,86 @@ async function draw3DPlot() {
     };
 
     Plotly.newPlot('profilerPlot', [trace], layout);
+}
+
+async function drawCoreDeviationChart() {
+    document.getElementById("profilerChart").style.display = "block";
+    document.getElementById("profilerPlot").style.display = "none";
+    document.getElementById("core").style.display = "none";
+    document.getElementById("task").style.display = "none";
+
+    const ctx = document.getElementById('profilerChart').getContext('2d');
+    if (chart) chart.destroy();
+
+    const res = await axios.get(`/profiles/deviation/core/${fileName}`);
+    const datas = res.data;
+
+    const labels = datas.map(d => d.core);
+    const deviations = datas.map(d => d.stddev_usaged);
+
+    chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Core별 Usage 표준편차',
+                data: deviations,
+                backgroundColor: 'rgba(255, 159, 64, 0.6)'
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: `${fileName}의 Core별 사용량 변동성 (표준편차)`,
+                    font: { size: 24 }
+                }
+            },
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+}
+
+async function drawTaskDeviationChart() {
+    document.getElementById("profilerChart").style.display = "block";
+    document.getElementById("profilerPlot").style.display = "none";
+    document.getElementById("core").style.display = "none";
+    document.getElementById("task").style.display = "none";
+
+    const ctx = document.getElementById('profilerChart').getContext('2d');
+    if (chart) chart.destroy();
+
+    const res = await axios.get(`/profiles/deviation/task/${fileName}`);
+    const datas = res.data;
+
+    const labels = datas.map(d => d.task);
+    const deviations = datas.map(d => d.stddev_usaged);
+
+    chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Task별 Usage 표준편차',
+                data: deviations,
+                backgroundColor: 'rgba(153, 102, 255, 0.6)'
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: `${fileName}의 Task별 사용량 변동성 (표준편차)`,
+                    font: { size: 24 }
+                }
+            },
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
 }
